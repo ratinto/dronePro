@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Mission {
+  id        Int      @id @default(autoincrement())
+  name      String
+  polygon   Json
+  createdAt DateTime @default(now())
+}
+
+model Drone {
+  id          Int              @id @default(autoincrement())
+  name        String
+  model       String
+  serialNo    String           @unique
+  status      String           @default("idle")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  telemetry   DroneTelemetry[]
+}
+
+model DroneTelemetry {
+  id           Int      @id @default(autoincrement())
+  droneId      Int
+  latitude     Float
+  longitude    Float
+  altitude     Float
+  speed        Float
+  heading      Float
+  batteryLevel Float
+  temperature  Float?
+  humidity     Float?
+  pressure     Float?
+  satellites   Int?
+  signalStrength Float?
+  flightMode   String   @default("manual")
+  armed        Boolean  @default(false)
+  timestamp    DateTime @default(now())
+  drone        Drone    @relation(fields: [droneId], references: [id], onDelete: Cascade)
+  
+  @@index([droneId])
+  @@index([timestamp])
+}
